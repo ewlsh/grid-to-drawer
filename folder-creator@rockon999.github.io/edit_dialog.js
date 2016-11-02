@@ -41,9 +41,10 @@ const EditDialog = new Lang.Class({
             style_class: 'run-dialog-label',
             text: _("Apps")
         });
-
+        this.contentLayout.height = 800;
         this.contentLayout.add(label, {
             x_fill: false,
+            y_fill: false,
             x_align: St.Align.START,
             y_align: St.Align.START
         });
@@ -55,18 +56,15 @@ const EditDialog = new Lang.Class({
 
         this._scrollView = new St.ScrollView({ x_fill: true, y_fill: true });
         this._scrollView.get_hscroll_bar().hide();
-
-        this._scrollView.set_policy(Gtk.PolicyType.NEVER,
-            Gtk.PolicyType.AUTOMATIC);
-        this.contentLayout.add(this._scrollView,
-            {
-                x_fill: true,
-                y_fill: true
-            });
+        this._scrollView.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC);
+        this.contentLayout.add(this._scrollView, { x_fill: true, y_fill: true });
 
         this._scrollView.add_actor(this._applicationList);
+
         let view = Main.overview.viewSelector.appDisplay._views[AppDisplay.Views.ALL].view;
         let apps = view.getAllItems();
+
+        /* Sort out any icons that are already in folders or are folders themselves. */
         apps = apps.filter(Lang.bind(this, function (value, index, array) {
             let folderid = Util.get_folder_for_app(value.id);
             if (value instanceof AppDisplay.AppIcon && (folderid === null || folderid === folder_id)) {
@@ -86,7 +84,6 @@ const EditDialog = new Lang.Class({
             let check = new CheckBox.CheckBox();
             check.getLabelActor().text = '';
             actor.add(check.actor);
-            //actor.add(app.create_icon_texture(16));
 
             this._appChecks.push([app.id, check]);
 
@@ -113,14 +110,6 @@ const EditDialog = new Lang.Class({
 
             this._applicationList.add(actor);
         }
-
-
-
-
-        this._errorMessage = new St.Label({
-            style_class: 'run-dialog-error-label'
-        });
-        this._errorMessage.clutter_text.line_wrap = true;
 
         this.setButtons([
             {
