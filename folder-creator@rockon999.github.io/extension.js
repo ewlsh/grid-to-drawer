@@ -12,6 +12,7 @@ const FolderIconPatch = Me.imports.folder_icon_patch;
 const AppIconPatch = Me.imports.app_icon_patch;
 const AppDisplayPatch = Me.imports.app_display_patch;
 const FolderDialog = Me.imports.folder_dialog;
+const EditDialog = Me.imports.edit_dialog;
 const Convenience = Me.imports.convenience;
 const Util = Me.imports.util;
 
@@ -192,7 +193,24 @@ function enable_selection() {
 
 // TODO: Figure out the best way to do this.
 function edit_folder(_source, id) {
-    if (!_source.editing) {
+    let selected_apps = Util.folder_exists(id) ? Util.get_apps(id) : [];
+    let dialog = new EditDialog.EditDialog(selected_apps, id);
+
+    dialog.connect('closed', Lang.bind(this, function () {
+        let apps = dialog.output;
+        if (apps !== null) {
+            Util.delete_folder(id);
+            if (apps.length > 0) {
+                Util.add_folder(id);
+                Util.add_apps(id, apps);
+            }
+        }
+        this.cancel_selection();
+
+    }));
+
+    dialog.open();
+    /*if (!_source.editing) {
         _source._ensurePopup();
         _source.view.actor.vscroll.adjustment.value = 0;
         _source._openSpaceForPopup();
@@ -201,7 +219,7 @@ function edit_folder(_source, id) {
             item.wiggle();
         });
         _source.editing = true;
-    }
+    }*/
 }
 
 
@@ -209,7 +227,12 @@ function _onCreateFolderBtnClick() {
     if (this._hidden)
         return;
 
+    if (this.selected_apps.length === 0)
+        return;
+
     let dialog = new FolderDialog.FolderDialog();
+
+
 
     dialog.connect('closed', Lang.bind(this, function () {
         let name = dialog.output;

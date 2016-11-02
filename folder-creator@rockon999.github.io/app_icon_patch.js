@@ -41,5 +41,4 @@ function MOD_onClicked(actor, button) {
     }
 
     return ORIG_onClicked.apply(this, arguments);
-
 }
