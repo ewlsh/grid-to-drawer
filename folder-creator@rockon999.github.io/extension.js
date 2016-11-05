@@ -1,4 +1,4 @@
-/* exported enable, disable, setup_ui, get_selecting, get_settings, show_selection_tools, hide_selection_tools, enable_selection, cancel_selection, set_selecting, edit_folder */
+/* exported enable, edit_app, get_search_results, disable, setup_ui, get_selecting, get_settings, show_selection_tools, hide_selection_tools, enable_selection, cancel_selection, set_selecting, edit_folder */
 /* exported _onButtonPress, _onClicked, _onCreateFolderBtnClick, _onDestroy, _onFolderBtnClick, _onLeaveEvent, _onMenuPoppedDown, _onTouchEvent */
 
 const Mainloop = imports.mainloop;
@@ -13,7 +13,9 @@ const AppIconPatch = Me.imports.app_icon_patch;
 const AppDisplayPatch = Me.imports.app_display_patch;
 const FolderDialog = Me.imports.folder_dialog;
 const EditDialog = Me.imports.edit_dialog;
+const EditAppDialog = Me.imports.edit_app_dialog;
 const Convenience = Me.imports.convenience;
+const Settings = Me.imports.settings;
 const Util = Me.imports.util;
 
 const AppDisplay = imports.ui.appDisplay;
@@ -53,6 +55,7 @@ function enable() {
 
     Mainloop.idle_add(Lang.bind(this, function () {
         get_app_view()._redisplay();
+        return false;
     }));
 }
 
@@ -104,17 +107,12 @@ function buildUI() {
 
     this.folder_box.add_actor(this._newFolderBtn);
 
-    //Main.overview._overview.add_actor(this.folder_box);
     Main.overview.viewSelector.appDisplay.actor.add_actor(this.folder_box);
 
     Main.overview.connect('hiding', Lang.bind(this, function () {
         this.cancel_selection();
     }));
-    /* new St.Bin({
-            style: 'margin-bottom: 20px; margin-right: 20px;',
-            child: this.folder_box,
 
-        })*/
     Main.overview.connect('showing', Lang.bind(this, function () {
         if (!AppDisplay._fc_loaded_mods) {
             log('Modded App Icons Loaded.');
@@ -159,6 +157,10 @@ function get_app_view() {
     return Main.overview.viewSelector.appDisplay._views[AppDisplay.Views.ALL].view;
 }
 
+function get_search_results() {
+    return Main.overview.viewSelector._searchResults;
+}
+
 function cancel_selection() {
     if (this.selecting) {
         this.selecting = false;
@@ -191,6 +193,46 @@ function enable_selection() {
     }
 }
 
+function edit_app(_source, id) {
+    let dialog = new EditAppDialog.EditAppDialog(_source.app);
+
+    dialog.connect('closed', Lang.bind(this, function () {
+        if (dialog.output !== null) {
+            let icon_path = dialog.output['icon_path'];
+            let icon_path_enabled = dialog.output['icon_path_enabled'];
+            let name = dialog.output['name'];
+            let name_enabled = dialog.output['name_enabled'];
+
+            if (typeof icon_path_enabled !== 'undefined') {
+                if (icon_path_enabled)
+                    Settings.enable_custom_icon(_source.app.id);
+                else
+                    Settings.disable_custom_icon(_source.app.id);
+
+            }
+            if (typeof name_enabled !== 'undefined') {
+                if (name_enabled)
+                    Settings.enable_custom_name(_source.app.id);
+                else
+                    Settings.disable_custom_name(_source.app.id);
+            }
+
+            if (typeof icon_path !== 'undefined') {
+                Settings.set_icon_path(_source.app.id, icon_path);
+            }
+            if (typeof name !== 'undefined') {
+                Settings.set_custom_name(_source.app.id, name);
+            }
+
+            get_app_view()._redisplay();
+        }
+    }));
+
+    dialog.open();
+
+
+}
+
 // TODO: Figure out the best way to do this.
 function edit_folder(_source, id) {
     let selected_apps = Util.folder_exists(id) ? Util.get_apps(id) : [];
@@ -210,16 +252,6 @@ function edit_folder(_source, id) {
     }));
 
     dialog.open();
-    /*if (!_source.editing) {
-        _source._ensurePopup();
-        _source.view.actor.vscroll.adjustment.value = 0;
-        _source._openSpaceForPopup();
-        _source._items.foreach(function (item) {
-            item.deletable = true;
-            item.wiggle();
-        });
-        _source.editing = true;
-    }*/
 }
 
 

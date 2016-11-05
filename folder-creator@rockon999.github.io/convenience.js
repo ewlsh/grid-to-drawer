@@ -1,4 +1,5 @@
-/* -*- mode: js; js-basic-offset: 4; indent-tabs-mode: nil -*- */
+/* exported initTranslations, getSettings, getSchemaObj */
+
 /*
   Copyright (c) 2011-2012, Giovanni Campagna <scampa.giovanni@gmail.com>
 
@@ -28,8 +29,9 @@
 const Gettext = imports.gettext;
 const Gio = imports.gi.Gio;
 
-const Config = imports.misc.config;
 const ExtensionUtils = imports.misc.extensionUtils;
+const Config = imports.misc.config;
+
 
 /**
  * initTranslations:
@@ -48,10 +50,12 @@ function initTranslations(domain) {
     // otherwise assume that extension has been installed in the
     // same prefix as gnome-shell
     let localeDir = extension.dir.get_child('locale');
-    if (localeDir.query_exists(null))
+
+    if (localeDir.query_exists(null)) {
         Gettext.bindtextdomain(domain, localeDir.get_path());
-    else
+    } else {
         Gettext.bindtextdomain(domain, Config.LOCALEDIR);
+    }
 }
 
 /**
@@ -63,9 +67,22 @@ function initTranslations(domain) {
  * metadata['settings-schema'].
  */
 function getSettings(schema) {
+    let schemaObj = getSchemaObj(schema);
+
+    return new Gio.Settings({ settings_schema: schemaObj });
+}
+
+/**
+ * Seperated from getSettings to allow for custom paths.
+ *
+ * @param {string} schema - the GSettings schema id (default from extension.metadata)
+ *
+ * @returns {Object} A GSettingsSchema found based on the given schema path.
+ */
+function getSchemaObj(schema, defaultSource = false) {
     let extension = ExtensionUtils.getCurrentExtension();
 
-    schema = schema;
+    schema = schema || extension.metadata['settings-schema'];
 
     const GioSSS = Gio.SettingsSchemaSource;
 
@@ -74,13 +91,20 @@ function getSettings(schema) {
     // otherwise assume that extension has been installed in the
     // same prefix as gnome-shell (and therefore schemas are available
     // in the standard folders)
-   // let schemaDir = extension.dir.get_child('schemas');
-    let schemaSource = GioSSS.get_default();
+    let schemaDir = extension.dir.get_child('schemas');
+    let schemaSource = null;
+
+    if (schemaDir.query_exists(null) && !defaultSource) {
+        schemaSource = GioSSS.new_from_directory(schemaDir.get_path(), GioSSS.get_default(), false);
+    } else {
+        schemaSource = GioSSS.get_default();
+    }
 
     let schemaObj = schemaSource.lookup(schema, true);
-    if (!schemaObj)
-        throw new Error('Schema ' + schema + ' could not be found for extension '
-                        + extension.metadata.uuid + '. Please check your installation.');
 
-    return new Gio.Settings({ settings_schema: schemaObj });
+    if (!schemaObj) {
+        throw new Error('Schema ' + schema + ' could not be found for extension ' + extension.metadata.uuid + '. Please check your installation.');
+    }
+
+    return schemaObj;
 }

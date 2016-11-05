@@ -1,0 +1,24 @@
+<schemalist>
+  <schema id="org.gnome.shell.extensions.folder-creator.customApps">
+    <key name="icon-path" type="s">
+      <default>''</default>
+      <summary>Custom icon path</summary>
+      <description>A file path for an image.</description>
+    </key>
+    <key name="name" type="s">
+      <default>''</default>
+      <summary>Custom name</summary>
+      <description>A name for an app.</description>
+    </key>
+    <key name="enable-custom-name" type="b">
+      <default>false</default>
+      <summary>Enable custom name</summary>
+      <description>Whether to use a custom name for an app.</description>
+    </key>
+    <key name="enable-custom-icon" type="b">
+      <default>false</default>
+      <summary>Enable custom icon</summary>
+      <description>Whether to use a custom icon for an app.</description>
+    </key>
+  </schema>
+</schemalist>

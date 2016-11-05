@@ -1,0 +1,9 @@
+<schemalist>
+  <schema id="org.gnome.shell.extensions.folder-creator" path="/org/gnome/shell/extensions/folder-creator/">
+<key name="custom-apps" type="as">
+      <default>[]</default>
+      <summary>Overrides settings for each app.</summary>
+      <description>Contains a list of the ids for all apps with custom settings.</description>
+    </key>
+      </schema>
+</schemalist>

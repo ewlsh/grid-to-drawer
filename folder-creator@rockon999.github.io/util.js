@@ -21,19 +21,6 @@ function add_folder(name) {
     folder.set_strv('categories', []);
 }
 
-function get_folder_for_app(id) {
-    let settings = Extension.get_settings();
-
-    let folder_children = settings.get_strv('folder-children');
-    for (let folder_id of folder_children) {
-        let apps = get_apps(folder_id);
-        if (apps.indexOf(id) !== -1) {
-            return folder_id;
-        }
-    }
-    return null;
-}
-
 function delete_folder(name) {
     let settings = Extension.get_settings();
 
@@ -66,6 +53,20 @@ function get_apps(name) {
     let folder = Gio.Settings.new_with_path('org.gnome.desktop.app-folders.folder', path);
     let folder_apps = folder.get_strv('apps');
     return folder_apps;
+}
+
+
+function get_folder_for_app(app_id) {
+    let settings = Extension.get_settings();
+
+    let folder_children = settings.get_strv('folder-children');
+    for (let folder_id of folder_children) {
+        let apps = get_apps(folder_id);
+        if (apps.indexOf(app_id) !== -1) {
+            return folder_id;
+        }
+    }
+    return null;
 }
 
 function folder_exists(name) {

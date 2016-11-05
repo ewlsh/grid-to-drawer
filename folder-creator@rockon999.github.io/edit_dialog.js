@@ -1,4 +1,4 @@
-/* exported FolderDialog */
+/* exported EditDialog */
 
 const Lang = imports.lang;
 
@@ -9,9 +9,7 @@ const Me = imports.misc.extensionUtils.getCurrentExtension();
 const Util = Me.imports.util;
 
 const ModalDialog = imports.ui.modalDialog;
-const ShellEntry = imports.ui.shellEntry;
 const Gtk = imports.gi.Gtk;
-const Tweener = imports.ui.tweener;
 
 const CheckBox = imports.ui.checkBox;
 
