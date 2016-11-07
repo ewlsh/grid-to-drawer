@@ -8,7 +8,6 @@ const St = imports.gi.St;
 const ModalDialog = imports.ui.modalDialog;
 const ShellEntry = imports.ui.shellEntry;
 
-
 const CheckBox = imports.ui.checkBox;
 
 const Me = imports.misc.extensionUtils.getCurrentExtension();
@@ -92,17 +91,12 @@ const EditAppDialog = new Lang.Class({
 
         this.entry = entry;
 
-
-
         ShellEntry.addContextMenu(this.entry);
 
 
         this.iconCheck.actor.connect('clicked', Lang.bind(this, function (check, mouse_button) {
-            if (Settings.is_customized(this.app.id) && Settings.has_custom_icon(this.app.id)) {
-                this.entry.set_text(Settings.get_icon_path(this.app.id));
-            } else {
-                this.entry.set_text('');
-            }
+            let icon_path = Settings.get_icon_path(this.app.id);
+            this.entry.set_text(icon_path);
 
             this.entry.reactive = check.checked;
             this.entry.clutter_text.editable = check.checked;
@@ -116,7 +110,6 @@ const EditAppDialog = new Lang.Class({
         this.app = app;
 
         this.appIcon = this.app.create_icon_texture(64);
-        this.appIcon.connect('button-press-event', Lang.bind(this, this.set_icon));
 
         this._leftLayout.add(this.appIcon, {
             y_align: St.Align.MIDDLE

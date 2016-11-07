@@ -6,7 +6,7 @@ const Clutter = imports.gi.Clutter;
 const St = imports.gi.St;
 
 const Me = imports.misc.extensionUtils.getCurrentExtension();
-const Util = Me.imports.util;
+const FolderUtil = Me.imports.folder_util;
 
 const ModalDialog = imports.ui.modalDialog;
 const ShellEntry = imports.ui.shellEntry;
@@ -110,7 +110,7 @@ const FolderDialog = new Lang.Class({
             this._showError("Please Enter A Folder Name.");
             return;
         }
-        if (Util.folder_exists(text)) {
+        if (FolderUtil.folder_exists(text)) {
             this._showError("That Folder Name Is Already In Use.");
             return;
         }
@@ -127,7 +127,7 @@ const FolderDialog = new Lang.Class({
         this._errorMessage.set_text(message);
 
         if (!this._errorBox.visible) {
-            let [errorBoxMinHeight, errorBoxNaturalHeight] = this._errorBox.get_preferred_height(-1);
+            let [errorBoxMinHeight, errorBoxNaturalHeight] = this._errorBox.get_preferred_height(-1); // eslint-disable-line no-unused-vars
 
             let parentActor = this._errorBox.get_parent();
             Tweener.addTween(parentActor, {
@@ -143,8 +143,9 @@ const FolderDialog = new Lang.Class({
         }
     },
     open: function () {
+        this.parent();
         this._errorBox.hide();
         this._entryText.set_text('');
-        this.parent();
+
     }
 });

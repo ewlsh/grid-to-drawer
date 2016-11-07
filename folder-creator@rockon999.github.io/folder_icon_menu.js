@@ -5,8 +5,7 @@ const Clutter = imports.gi.Clutter;
 const St = imports.gi.St;
 
 const Me = imports.misc.extensionUtils.getCurrentExtension();
-const Extension = Me.imports.extension;
-const Util = Me.imports.util;
+const FolderUtil = Me.imports.folder_util;
 
 const PopupMenu = imports.ui.popupMenu;
 const Main = imports.ui.main;
@@ -45,12 +44,12 @@ const FolderIconMenu = new Lang.Class({
 
         let item = this._appendMenuItem("Edit Folder");
         item.connect('activate', Lang.bind(this, function () {
-            Extension.edit_folder(this._source, this._source.id);
+            FolderUtil.edit_folder(this._source.id);
         }));
 
         item = this._appendMenuItem("Delete Folder");
         item.connect('activate', Lang.bind(this, function () {
-            Util.delete_folder(this._source.id);
+            FolderUtil.remove_folder(this._source.id);
         }));
     },
 

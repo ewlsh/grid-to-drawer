@@ -1,171 +1,65 @@
 /* exported enable, edit_app, get_search_results, disable, setup_ui, get_selecting, get_settings, show_selection_tools, hide_selection_tools, enable_selection, cancel_selection, set_selecting, edit_folder */
 /* exported _onButtonPress, _onClicked, _onCreateFolderBtnClick, _onDestroy, _onFolderBtnClick, _onLeaveEvent, _onMenuPoppedDown, _onTouchEvent */
 
-const Mainloop = imports.mainloop;
-const Lang = imports.lang;
-
-const Clutter = imports.gi.Clutter;
-const St = imports.gi.St;
-
 const Me = imports.misc.extensionUtils.getCurrentExtension();
-const FolderIconPatch = Me.imports.folder_icon_patch;
-const AppIconPatch = Me.imports.app_icon_patch;
-const AppDisplayPatch = Me.imports.app_display_patch;
-const FolderDialog = Me.imports.folder_dialog;
-const EditDialog = Me.imports.edit_dialog;
-const EditAppDialog = Me.imports.edit_app_dialog;
-const Convenience = Me.imports.convenience;
-const Settings = Me.imports.settings;
-const Util = Me.imports.util;
+const UI = Me.imports.ui;
 
 const AppDisplay = imports.ui.appDisplay;
-const ViewSelector = imports.ui.viewSelector;
 
-const Main = imports.ui.main;
-
+const DashPatch = Me.imports.patches.Dash;
+const FolderIconPatch = Me.imports.patches.FolderIcon;
+const AppIconPatch = Me.imports.patches.AppIcon;
+const AppIconMenuPatch = Me.imports.patches.AppIconMenu;
+const AllViewPatch = Me.imports.patches.AllView;
+const BaseAppViewPatch = Me.imports.patches.BaseAppView;
+const AppSearchProviderPatch = Me.imports.patches.AppSearchProvider;
 
 
 function enable() {
-    this.settings = Convenience.getSettings('org.gnome.desktop.app-folders');
+    AppDisplay._fc_creating_new_folder = false;
+    AppDisplay._fc_loaded_mods = false;
 
-    inject_variables();
-
+    DashPatch.patch();
     FolderIconPatch.patch();
     AppIconPatch.patch();
-    AppDisplayPatch.patch();
-
-    buildUI();
+    AppIconMenuPatch.patch();
+    AllViewPatch.patch();
+    BaseAppViewPatch.patch();
+    AppSearchProviderPatch.patch();
 
     this.selecting = false;
     this.selected_apps = [];
     this._hidden = false;
 
-    get_app_view().connect('modded-icon-created', Lang.bind(this, function (n, icon) {
-        const app_ = icon.app;
-
-        icon.actor.connect('clicked', Lang.bind(this, function (actor, button) {
-            if (this.selected_apps.indexOf(app_.id) === -1) {
-                this.selected_apps.push(app_.id);
-            } else {
-                this.selected_apps.splice(this.selected_apps.indexOf(app_.id), 1);
-            }
-
-        }));
-    }));
-
-    Mainloop.idle_add(Lang.bind(this, function () {
-        get_app_view()._redisplay();
-        return false;
-    }));
+    UI.setup();
+    UI.connect();
 }
 
 
 function disable() {
     cancel_selection();
-    hide_selection_tools();
-}
+    UI.hide_selection_tools();
 
+    UI.disconnect();
+    UI.cleanup();
 
-function inject_variables() {
-    AppDisplay._fc_creating_new_folder = false;
-    AppDisplay._fc_loaded_mods = false;
-}
+    DashPatch.unpatch();
+    FolderIconPatch.unpatch();
+    AppIconPatch.unpatch();
+    AppIconMenuPatch.unpatch();
+    AllViewPatch.unpatch();
+    BaseAppViewPatch.unpatch();
+    AppSearchProviderPatch.unpatch();
 
-function buildUI() {
-    this.folder_box = new St.Widget({
-        layout_manager: new Clutter.BoxLayout({ spacing: 20 }),
-        x_expand: true,
-        y_expand: false,
-        x_align: Clutter.ActorAlign.END,
-        y_align: Clutter.ActorAlign.CENTER
-    });
-
-    this._newFolderBtn = new St.Button({
-        can_focus: true
-    });
-    this._newFolderBtn.child = new St.Icon({ icon_name: 'folder-new', icon_size: 32 });
-
-    this._createFolderBtn = new St.Button({
-        can_focus: true
-
-    });
-
-    this._createFolderBtn.child = new St.Icon({ icon_name: 'object-select-symbolic', fallback_icon_name: 'dialog-yes', icon_size: 32 });
-
-    this._cancelFolderBtn = new St.Button({
-        can_focus: true
-    });
-
-    this._cancelFolderBtn.child = new St.Icon({ icon_name: 'dialog-cancel', icon_size: 20 });
-
-    this._newFolderBtn.connect('clicked', Lang.bind(this, this._onFolderBtnClick));
-    this._cancelFolderBtn.connect('clicked', Lang.bind(this, this._onFolderBtnClick));
-    this._createFolderBtn.connect('clicked', Lang.bind(this, this._onCreateFolderBtnClick));
-
-
-    this.folder_box.add_style_class_name('folder-box');
-
-    this.folder_box.add_actor(this._newFolderBtn);
-
-    Main.overview.viewSelector.appDisplay.actor.add_actor(this.folder_box);
-
-    Main.overview.connect('hiding', Lang.bind(this, function () {
-        this.cancel_selection();
-    }));
-
-    Main.overview.connect('showing', Lang.bind(this, function () {
-        if (!AppDisplay._fc_loaded_mods) {
-            log('Modded App Icons Loaded.');
-            get_app_view()._redisplay();
-        }
-    }));
-
-    Main.overview.viewSelector.connect('page-changed', Lang.bind(this, function () {
-        if (Main.overview.viewSelector.getActivePage() === ViewSelector.ViewPage.APPS) {
-            if (global.settings.get_uint('app-picker-view') === AppDisplay.Views.ALL) {
-                show_selection_tools();
-            } else {
-                hide_selection_tools();
-            }
-        } else {
-            hide_selection_tools();
-            cancel_selection();
-        }
-
-    }));
-
-    global.settings.connect('changed::app-picker-view', Lang.bind(this, function () {
-        if (global.settings.get_uint('app-picker-view') === AppDisplay.Views.ALL) {
-            show_selection_tools();
-        } else {
-            hide_selection_tools();
-        }
-    }));
-}
-
-function show_selection_tools() {
-    this.folder_box.set_opacity(255);
-    this._hidden = false;
-}
-
-function hide_selection_tools() {
-    this.folder_box.set_opacity(0);
-    this._hidden = true;
-}
-
-function get_app_view() {
-    return Main.overview.viewSelector.appDisplay._views[AppDisplay.Views.ALL].view;
-}
-
-function get_search_results() {
-    return Main.overview.viewSelector._searchResults;
+    delete AppDisplay._fc_creating_new_folder;
+    delete AppDisplay._fc_loaded_mods;
 }
 
 function cancel_selection() {
     if (this.selecting) {
         this.selecting = false;
 
-        for (let icon of get_app_view()._allItems) {
+        for (let icon of UI.get_app_view()._allItems) {
             icon._fc_selected = false;
             icon.actor.remove_style_class_name('selected-app-icon');
         }
@@ -174,9 +68,9 @@ function cancel_selection() {
 
         AppDisplay._fc_creating_new_folder = false;
 
-        this.folder_box.remove_actor(this._createFolderBtn);
-        this.folder_box.remove_actor(this._cancelFolderBtn);
-        this.folder_box.add_actor(this._newFolderBtn);
+        UI.folder_box.remove_actor(UI._createFolderBtn);
+        UI.folder_box.remove_actor(UI._cancelFolderBtn);
+        UI.folder_box.add_actor(UI._newFolderBtn);
     }
 }
 
@@ -187,110 +81,8 @@ function enable_selection() {
 
         AppDisplay._fc_creating_new_folder = true;
 
-        this.folder_box.remove_actor(this._newFolderBtn);
-        this.folder_box.add_actor(this._createFolderBtn);
-        this.folder_box.add_actor(this._cancelFolderBtn);
+        UI.folder_box.remove_actor(UI._newFolderBtn);
+        UI.folder_box.add_actor(UI._createFolderBtn);
+        UI.folder_box.add_actor(UI._cancelFolderBtn);
     }
-}
-
-function edit_app(_source, id) {
-    let dialog = new EditAppDialog.EditAppDialog(_source.app);
-
-    dialog.connect('closed', Lang.bind(this, function () {
-        if (dialog.output !== null) {
-            let icon_path = dialog.output['icon_path'];
-            let icon_path_enabled = dialog.output['icon_path_enabled'];
-            let name = dialog.output['name'];
-            let name_enabled = dialog.output['name_enabled'];
-
-            if (typeof icon_path_enabled !== 'undefined') {
-                if (icon_path_enabled)
-                    Settings.enable_custom_icon(_source.app.id);
-                else
-                    Settings.disable_custom_icon(_source.app.id);
-
-            }
-            if (typeof name_enabled !== 'undefined') {
-                if (name_enabled)
-                    Settings.enable_custom_name(_source.app.id);
-                else
-                    Settings.disable_custom_name(_source.app.id);
-            }
-
-            if (typeof icon_path !== 'undefined') {
-                Settings.set_icon_path(_source.app.id, icon_path);
-            }
-            if (typeof name !== 'undefined') {
-                Settings.set_custom_name(_source.app.id, name);
-            }
-
-            get_app_view()._redisplay();
-        }
-    }));
-
-    dialog.open();
-
-
-}
-
-// TODO: Figure out the best way to do this.
-function edit_folder(_source, id) {
-    let selected_apps = Util.folder_exists(id) ? Util.get_apps(id) : [];
-    let dialog = new EditDialog.EditDialog(selected_apps, id);
-
-    dialog.connect('closed', Lang.bind(this, function () {
-        let apps = dialog.output;
-        if (apps !== null) {
-            Util.delete_folder(id);
-            if (apps.length > 0) {
-                Util.add_folder(id);
-                Util.add_apps(id, apps);
-            }
-        }
-        this.cancel_selection();
-
-    }));
-
-    dialog.open();
-}
-
-
-function _onCreateFolderBtnClick() {
-    if (this._hidden)
-        return;
-
-    if (this.selected_apps.length === 0)
-        return;
-
-    let dialog = new FolderDialog.FolderDialog();
-
-
-
-    dialog.connect('closed', Lang.bind(this, function () {
-        let name = dialog.output;
-        Util.add_folder(name);
-        Util.add_apps(name, this.selected_apps);
-        this.cancel_selection();
-    }));
-
-    dialog.open();
-}
-
-function _onFolderBtnClick() {
-    if (this._hidden)
-        return;
-    if (this.selecting) {
-        this.cancel_selection();
-    } else {
-        this.enable_selection();
-    }
-
-}
-
-
-
-
-
-function get_settings() {
-    return this.settings;
 }

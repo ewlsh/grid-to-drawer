@@ -1,6 +1,4 @@
-/* exported patch */
-
-const Lang = imports.lang;
+/* exported patch, unpatch */
 
 const Clutter = imports.gi.Clutter;
 const Gio = imports.gi.Gio;
@@ -10,35 +8,33 @@ const AppDisplay = imports.ui.appDisplay;
 
 const Me = imports.misc.extensionUtils.getCurrentExtension();
 const Settings = Me.imports.settings;
-const Extension = Me.imports.extension;
 
 const ORIG_init = AppDisplay.AppIcon.prototype._init;
 const ORIG_onClicked = AppDisplay.AppIcon.prototype._onClicked;
 const ORIG_onButtonPress = AppDisplay.AppIcon.prototype._onButtonPress;
-const ORIG_createIcon = AppDisplay.AppIcon.prototype._createIcon; // eslint-disable-line
-const ORIG_redisplay = AppDisplay.AppIconMenu.prototype._redisplay; // eslint-disable-line
+const ORIG_createIcon = AppDisplay.AppIcon.prototype._createIcon;
 
 function patch() {
     AppDisplay.AppIcon.prototype._init = MOD_init;
     AppDisplay.AppIcon.prototype._onClicked = MOD_onClicked;
     AppDisplay.AppIcon.prototype._onButtonPress = MOD_onButtonPress;
     AppDisplay.AppIcon.prototype._createIcon = MOD_createIcon;
-    AppDisplay.AppIconMenu.prototype._redisplay = MOD_redisplay;
+}
+
+function unpatch() {
+    AppDisplay.AppIcon.prototype._init = ORIG_init;
+    AppDisplay.AppIcon.prototype._onClicked = ORIG_onClicked;
+    AppDisplay.AppIcon.prototype._onButtonPress = ORIG_onButtonPress;
+    AppDisplay.AppIcon.prototype._createIcon = ORIG_createIcon;
 }
 
 function MOD_init() {
     ORIG_init.apply(this, arguments);
-    if (Settings.is_customized(this.app.id) && Settings.has_custom_name(this.app.id)) {
-        this.actor.label_actor.text = Settings.get_custom_name(this.app.id);
+    if (this.actor.label_actor !== null) {
+        if (Settings.is_customized(this.app.id) && Settings.has_custom_name(this.app.id)) {
+            this.actor.label_actor.text = Settings.get_custom_name(this.app.id);
+        }
     }
-}
-
-function MOD_redisplay() {
-    ORIG_redisplay.apply(this, arguments);
-    let item = this._appendMenuItem('Edit AppIcon');
-    item.connect('activate', Lang.bind(this, function () {
-        Extension.edit_app(this._source, this._source.id);
-    }));
 }
 
 function MOD_createIcon(iconSize) {

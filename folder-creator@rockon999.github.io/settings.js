@@ -1,4 +1,4 @@
-/* exported SettingsManager, has_custom_name, enable_custom_name, get_custom_name, set_custom_name, disable_customization, disable_customization, disable_custom_name has_custom_icon, enable_custom_icon, disable_custom_icon, get_icon_path, set_icon_path */
+/* exported SettingsManager, get_customized, has_custom_name, enable_custom_name, get_custom_name, set_custom_name, disable_customization, disable_customization, disable_custom_name has_custom_icon, enable_custom_icon, disable_custom_icon, get_icon_path, set_icon_path, get_folder_settings */
 
 const Lang = imports.lang;
 
@@ -33,6 +33,11 @@ function enable_customization(app_id) {
 function is_customized(app_id) {
     let settings = SettingsManager.settings;
     return (settings.get_strv('custom-apps').indexOf(app_id) !== -1);
+}
+
+function get_customized() {
+    let settings = SettingsManager.settings;
+    return settings.get_strv('custom-apps');
 }
 
 function has_custom_icon(app_id) {
@@ -83,7 +88,7 @@ function set_icon_path(app_id, path) {
 
 // NAME FUNCS
 
-function has_custom_name (app_id) {
+function has_custom_name(app_id) {
     if (!is_customized(app_id)) {
         return false;
     }
@@ -128,11 +133,23 @@ function set_custom_name(app_id, path) {
     app_settings.set_string('name', path);
 }
 
+function get_folder_settings(name) {
+    if (typeof name === 'undefined') {
+        return SettingsManager.folder_settings;
+    }
+
+    let path = SettingsManager.folder_settings.path + 'folders/' + name + '/';
+    return Gio.Settings.new_with_path('org.gnome.desktop.app-folders.folder', path);
+}
+
 
 const _SettingsManager = new Lang.Class({
     Name: 'fc_SettingsManager',
     load: function () {
         this.settings = Convenience.getSettings();
+
+        this.folder_settings = Convenience.getSettings('org.gnome.desktop.app-folders');
+
         this.app_settings = {};
 
         let custom_apps = this.settings.get_strv('custom-apps');

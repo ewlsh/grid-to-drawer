@@ -1,4 +1,4 @@
-/* exported patch */
+/* exported patch, unpatch */
 
 const Lang = imports.lang;
 
@@ -12,8 +12,11 @@ const PopupMenu = imports.ui.popupMenu;
 const Main = imports.ui.main;
 
 const ORIG_folder_init = AppDisplay.FolderIcon.prototype._init;
-const ORIG_onButtonPress = AppDisplay.AppIcon.prototype._onButtonPress;
-const ORIG_onTouchEvent = AppDisplay.AppIcon.prototype._onTouchEvent;
+const ORIG_folder_onButtonPress = AppDisplay.FolderIcon.prototype._onButtonPress;
+const ORIG_folder_onTouchEvent = AppDisplay.FolderIcon.prototype._onTouchEvent;
+const ORIG_folder_onDestroy = AppDisplay.FolderIcon.prototype._onDestroy;
+
+const APPICON_onButtonPress = AppDisplay.AppIcon.prototype._onButtonPress;
 
 function patch() {
     AppDisplay.FolderIcon.prototype._setPopupTimeout = AppDisplay.AppIcon.prototype._setPopupTimeout;
@@ -21,15 +24,28 @@ function patch() {
     AppDisplay.FolderIcon.prototype._onMenuPoppedDown = AppDisplay.AppIcon.prototype._onMenuPoppedDown;
     AppDisplay.FolderIcon.prototype._onLeaveEvent = AppDisplay.AppIcon.prototype._onLeaveEvent;
     AppDisplay.FolderIcon.prototype._onDestroy = AppDisplay.AppIcon.prototype._onDestroy;
+    AppDisplay.FolderIcon.prototype._onTouchEvent = AppDisplay.AppIcon.prototype._onTouchEvent;
 
-
-    AppDisplay.FolderIcon.prototype._onTouchEvent = ORIG_onTouchEvent;
     // Filter out primary clicks.
     AppDisplay.FolderIcon.prototype._onButtonPress = MOD_onButtonPress;
     // Add popup menu.
     AppDisplay.FolderIcon.prototype.popupMenu = MOD_popupMenu;
     // Define necessary variables.
     AppDisplay.FolderIcon.prototype._init = MOD_init;
+}
+
+function unpatch() {
+    delete AppDisplay.FolderIcon.prototype._setPopupTimeout;
+    delete AppDisplay.FolderIcon.prototype._removeMenuTimeout;
+    delete AppDisplay.FolderIcon.prototype._onMenuPoppedDown;
+    delete AppDisplay.FolderIcon.prototype._onLeaveEvent;
+    delete AppDisplay.FolderIcon.prototype.popupMenu;
+
+    AppDisplay.FolderIcon.prototype._onDestroy = ORIG_folder_onDestroy;
+    AppDisplay.FolderIcon.prototype._onTouchEvent = ORIG_folder_onTouchEvent;
+    AppDisplay.FolderIcon.prototype._onButtonPress = ORIG_folder_onButtonPress;
+
+    AppDisplay.FolderIcon.prototype._init = ORIG_folder_init;
 }
 
 function MOD_init() {
@@ -88,5 +104,5 @@ function MOD_onButtonPress(actor, event) {
         return Clutter.EVENT_PROPAGATE;
     }
 
-    return ORIG_onButtonPress.apply(this, arguments);
+    return APPICON_onButtonPress.apply(this, arguments);
 }

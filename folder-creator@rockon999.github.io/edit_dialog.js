@@ -6,7 +6,7 @@ const Clutter = imports.gi.Clutter;
 const St = imports.gi.St;
 
 const Me = imports.misc.extensionUtils.getCurrentExtension();
-const Util = Me.imports.util;
+const FolderUtil = Me.imports.folder_util;
 
 const ModalDialog = imports.ui.modalDialog;
 const Gtk = imports.gi.Gtk;
@@ -16,7 +16,6 @@ const CheckBox = imports.ui.checkBox;
 const AppDisplay = imports.ui.appDisplay;
 
 const Main = imports.ui.main;
-
 
 
 // TODO: Translations.
@@ -64,7 +63,7 @@ const EditDialog = new Lang.Class({
 
         /* Sort out any icons that are already in folders or are folders themselves. */
         apps = apps.filter(Lang.bind(this, function (value, index, array) {
-            let folderid = Util.get_folder_for_app(value.id);
+            let folderid = FolderUtil.get_folder_for_app(value.id);
             if (value instanceof AppDisplay.AppIcon && (folderid === null || folderid === folder_id)) {
                 return true;
             }
