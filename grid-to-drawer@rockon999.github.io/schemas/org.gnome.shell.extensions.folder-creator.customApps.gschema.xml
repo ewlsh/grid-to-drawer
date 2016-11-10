@@ -1,5 +1,5 @@
 <schemalist>
-  <schema id="org.gnome.shell.extensions.folder-creator.customApps">
+  <schema id="org.gnome.shell.extensions.grid-to-drawer.customApps">
     <key name="icon-path" type="s">
       <default>''</default>
       <summary>Custom icon path</summary>

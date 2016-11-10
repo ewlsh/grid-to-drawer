@@ -13,8 +13,8 @@ const CheckBox = imports.ui.checkBox;
 const Me = imports.misc.extensionUtils.getCurrentExtension();
 const Settings = Me.imports.settings;
 
-// TODO: Translations.
-//const _ = function (a) { return a; };
+const Gettext = imports.gettext.domain('grid-to-drawer');
+const _ = Gettext.gettext;
 
 const EditAppDialog = new Lang.Class({
     Name: 'EditAppDialog',

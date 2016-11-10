@@ -5,7 +5,7 @@ const Lang = imports.lang;
 const AppDisplay = imports.ui.appDisplay;
 
 const Me = imports.misc.extensionUtils.getCurrentExtension();
-const AppUtil = Me.imports.app_util;
+const Editor = Me.imports.editor;
 
 const ORIG_redisplay = AppDisplay.AppIconMenu.prototype._redisplay;
 
@@ -21,6 +21,6 @@ function MOD_redisplay() {
     ORIG_redisplay.apply(this, arguments);
     let item = this._appendMenuItem('Edit');
     item.connect('activate', Lang.bind(this, function () {
-        AppUtil.edit_app(this._source.app);
+        Editor.edit_app(this._source.app);
     }));
 }

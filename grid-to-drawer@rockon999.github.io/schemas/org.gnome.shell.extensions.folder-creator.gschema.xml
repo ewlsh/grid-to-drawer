@@ -1,5 +1,5 @@
 <schemalist>
-  <schema id="org.gnome.shell.extensions.folder-creator" path="/org/gnome/shell/extensions/folder-creator/">
+  <schema id="org.gnome.shell.extensions.grid-to-drawer" path="/org/gnome/shell/extensions/grid-to-drawer/">
 <key name="custom-apps" type="as">
       <default>[]</default>
       <summary>Overrides settings for each app.</summary>

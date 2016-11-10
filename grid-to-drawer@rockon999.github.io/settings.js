@@ -155,8 +155,8 @@ const _SettingsManager = new Lang.Class({
         let custom_apps = this.settings.get_strv('custom-apps');
 
         for (let app_id of custom_apps) {
-            let custom_path = '/org/gnome/shell/extensions/folder-creator/customApps/' + '' + app_id + '/';
-            let obj = Convenience.getSchemaObj('org.gnome.shell.extensions.folder-creator.customApps');
+            let custom_path = '/org/gnome/shell/extensions/grid-to-drawer/customApps/' + '' + app_id + '/';
+            let obj = Convenience.getSchemaObj('org.gnome.shell.extensions.grid-to-drawer.customApps');
             let app_settings = new Gio.Settings({ path: custom_path, settings_schema: obj });
             this.app_settings[app_id] = app_settings;
         }
@@ -167,8 +167,8 @@ const _SettingsManager = new Lang.Class({
         let custom_apps = this.settings.get_strv('custom-apps');
 
         for (let app_id of custom_apps) {
-            let custom_path = '/org/gnome/shell/extensions/folder-creator/customApps/' + '' + app_id + '/';
-            let obj = Convenience.getSchemaObj('org.gnome.shell.extensions.folder-creator.customApps');
+            let custom_path = '/org/gnome/shell/extensions/grid-to-drawer/customApps/' + '' + app_id + '/';
+            let obj = Convenience.getSchemaObj('org.gnome.shell.extensions.grid-to-drawer.customApps');
             let app_settings = new Gio.Settings({ path: custom_path, settings_schema: obj });
             this.app_settings[app_id] = app_settings;
         }

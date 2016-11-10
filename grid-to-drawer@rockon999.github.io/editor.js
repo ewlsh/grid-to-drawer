@@ -1,12 +1,15 @@
-/* exported edit_app */
+/* exported edit_app, edit_folder */
 
 const Mainloop = imports.mainloop;
 const Lang = imports.lang;
 
 const Me = imports.misc.extensionUtils.getCurrentExtension();
 const EditAppDialog = Me.imports.edit_app_dialog;
+const EditDialog = Me.imports.edit_dialog;
 const DashPatch = Me.imports.patches.Dash;
 const Settings = Me.imports.settings;
+const FolderUtil = Me.imports.folder_util;
+const Selection = Me.imports.selection;
 const UI = Me.imports.ui;
 
 function edit_app(app) {
@@ -53,4 +56,24 @@ function edit_app(app) {
     dialog.open();
 
 
+}
+
+
+function edit_folder(name) {
+    let selected_apps = FolderUtil.folder_exists(name) ? FolderUtil.get_apps(name) : [];
+    let dialog = new EditDialog.EditDialog(selected_apps, name);
+
+    dialog.connect('closed', Lang.bind(this, function () {
+        let apps = dialog.output;
+        if (apps !== null) {
+            FolderUtil.remove_folder(name);
+            if (apps.length > 0) {
+                FolderUtil.create_folder(name);
+                FolderUtil.add_apps(name, apps);
+            }
+        }
+        Selection.cancel_selection();
+    }));
+
+    dialog.open();
 }

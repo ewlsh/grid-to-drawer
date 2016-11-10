@@ -1,4 +1,4 @@
-/* exported setup, cleanup, connect, disconnect, get_search_results, get_frequent_view, _onButtonPress, _onClicked, _onCreateFolderBtnClick, _onDestroy, _onFolderBtnClick, _onLeaveEvent, _onMenuPoppedDown, _onTouchEvent */
+/* exported setup, cleanup, connect, is_hidden, disconnect, get_search_results, get_frequent_view, _onButtonPress, _onClicked, _onCreateFolderBtnClick, _onDestroy, _onFolderBtnClick, _onLeaveEvent, _onMenuPoppedDown, _onTouchEvent */
 
 const Mainloop = imports.mainloop;
 const Lang = imports.lang;
@@ -10,13 +10,14 @@ const Main = imports.ui.main;
 
 const Me = imports.misc.extensionUtils.getCurrentExtension();
 const FolderDialog = Me.imports.folder_dialog;
-const Extension = Me.imports.extension;
 const FolderUtil = Me.imports.folder_util;
 
 const AppDisplay = imports.ui.appDisplay;
 const ViewSelector = imports.ui.viewSelector;
 
 function setup() {
+    this._hidden = false;
+
     this.folder_box = new St.Widget({
         layout_manager: new Clutter.BoxLayout({ spacing: 20 }),
         x_expand: true,
@@ -60,6 +61,8 @@ function setup() {
 }
 
 function cleanup() {
+    this._hidden = null;
+
     this.folder_box = null;
     this._newFolderBtn = null;
     this._createFolderBtn = null;
@@ -74,7 +77,7 @@ function cleanup() {
 
 function connect() {
     this.overviewHiddenSig = Main.overview.connect('hiding', Lang.bind(this, function () {
-        Extension.cancel_selection();
+        Selection.cancel_selection();
     }));
 
     this.overviewShownSig = Main.overview.connect('showing', Lang.bind(this, function () {
@@ -93,7 +96,7 @@ function connect() {
             }
         } else {
             hide_selection_tools();
-            Extension.cancel_selection();
+            Selection.cancel_selection();
         }
 
     }));
@@ -110,10 +113,10 @@ function connect() {
         const app_ = icon.app;
 
         icon.actor.connect('clicked', Lang.bind(this, function (actor, button) {
-            if (Extension.selected_apps.indexOf(app_.id) === -1) {
-                Extension.selected_apps.push(app_.id);
+            if (Selection.get_selection().indexOf(app_.id) === -1) {
+                Selection.add_selection(app_.id);
             } else {
-                Extension.selected_apps.splice(Extension.selected_apps.indexOf(app_.id), 1);
+                Selection.get_selection().splice(Selection.get_selection().indexOf(app_.id), 1);
             }
 
         }));
@@ -132,12 +135,12 @@ function disconnect() {
 
 function show_selection_tools() {
     this.folder_box.set_opacity(255);
-    Extension._hidden = false;
+    this._hidden = false;
 }
 
 function hide_selection_tools() {
     this.folder_box.set_opacity(0);
-    Extension._hidden = true;
+    this._hidden = true;
 }
 
 function get_app_view() {
@@ -152,12 +155,16 @@ function get_search_results() {
     return Main.overview.viewSelector._searchResults;
 }
 
+function is_hidden() {
+    return this._hidden;
+}
+
 
 function _onCreateFolderBtnClick() {
-    if (Extension._hidden)
+    if (this._hidden)
         return;
 
-    if (Extension.selected_apps.length === 0)
+    if (Selection.get_selection().length === 0)
         return;
 
     let dialog = new FolderDialog.FolderDialog();
@@ -165,20 +172,19 @@ function _onCreateFolderBtnClick() {
     dialog.connect('closed', Lang.bind(this, function () {
         let name = dialog.output;
         FolderUtil.create_folder(name);
-        FolderUtil.add_apps(name, Extension.selected_apps);
-        Extension.cancel_selection();
+        FolderUtil.add_apps(name, Selection.get_selection());
+        Selection.cancel_selection();
     }));
 
     dialog.open();
 }
 
 function _onFolderBtnClick() {
-    if (Extension._hidden)
+    if (this._hidden)
         return;
-    if (Extension.selecting) {
-        Extension.cancel_selection();
+    if (Selection.is_active()) {
+        Selection.cancel_selection();
     } else {
-        Extension.enable_selection();
+        Selection.enable_selection();
     }
-
 }

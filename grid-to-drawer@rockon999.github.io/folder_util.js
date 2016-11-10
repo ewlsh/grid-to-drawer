@@ -1,10 +1,6 @@
-/* exported create_folder, remove_folder, edit_folder, add_apps, get_for_app, folder_exists, get_folder_for_app */
-
-const Lang = imports.lang;
+/* exported create_folder, remove_folder, add_apps, get_for_app, folder_exists, get_folder_for_app */
 
 const Me = imports.misc.extensionUtils.getCurrentExtension();
-const EditDialog = Me.imports.edit_dialog;
-const Extension = Me.imports.extension;
 const Settings = Me.imports.settings;
 
 function create_folder(name) {
@@ -70,23 +66,4 @@ function folder_exists(name) {
     let settings = Settings.get_folder_settings();
     let folder_children = settings.get_strv('folder-children');
     return (folder_children.indexOf(name) !== -1);
-}
-
-function edit_folder(name) {
-    let selected_apps = folder_exists(name) ? get_apps(name) : [];
-    let dialog = new EditDialog.EditDialog(selected_apps, name);
-
-    dialog.connect('closed', Lang.bind(this, function () {
-        let apps = dialog.output;
-        if (apps !== null) {
-            remove_folder(name);
-            if (apps.length > 0) {
-                create_folder(name);
-                add_apps(name, apps);
-            }
-        }
-        Extension.cancel_selection();
-    }));
-
-    dialog.open();
 }
