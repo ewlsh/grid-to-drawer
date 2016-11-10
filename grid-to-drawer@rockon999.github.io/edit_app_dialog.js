@@ -26,7 +26,6 @@ const EditAppDialog = new Lang.Class({
             destroyOnClose: false
         });
 
-
         this.output = null;
 
         this._hbox = new St.BoxLayout();
@@ -36,7 +35,7 @@ const EditAppDialog = new Lang.Class({
         this._leftLayout.set_style('padding-right: 20px;');
 
         let check = new CheckBox.CheckBox();
-        check.getLabelActor().text = "Custom App Name";
+        check.getLabelActor().text = _("Custom App Name");
         this.nameCheck = check;
 
         this._rightLayout.add(check.actor, {
@@ -74,7 +73,7 @@ const EditAppDialog = new Lang.Class({
         // ICON
 
         check = new CheckBox.CheckBox();
-        check.getLabelActor().text = "Custom App Icon";
+        check.getLabelActor().text = _("Custom App Icon");
 
         this.iconCheck = check;
 
@@ -128,12 +127,12 @@ const EditAppDialog = new Lang.Class({
         this.setButtons([
             {
                 action: Lang.bind(this, this.exit),
-                label: "Close",
+                label: _("Close"),
                 key: Clutter.Escape
             },
             {
                 action: Lang.bind(this, this.save),
-                label: "Save",
+                label: _("Save"),
                 'default': true
             }
         ]);

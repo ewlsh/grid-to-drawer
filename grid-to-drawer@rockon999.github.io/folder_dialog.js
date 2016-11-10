@@ -12,9 +12,8 @@ const ModalDialog = imports.ui.modalDialog;
 const ShellEntry = imports.ui.shellEntry;
 const Tweener = imports.ui.tweener;
 
-
-// TODO: Translations.
-const _ = function (a) { return a; };
+const Gettext = imports.gettext.domain('grid-to-drawer');
+const _ = Gettext.gettext;
 
 const FolderDialog = new Lang.Class({
     Name: 'FolderDialog',
@@ -94,12 +93,12 @@ const FolderDialog = new Lang.Class({
         this.setButtons([
             {
                 action: Lang.bind(this, this.close),
-                label: "Close",
+                label: _("Close"),
                 key: Clutter.Escape
             },
             {
                 action: Lang.bind(this, this.set_name),
-                label: "Set Name",
+                label: _("Create Folder"),
                 'default': true
             }
         ]);
@@ -107,11 +106,11 @@ const FolderDialog = new Lang.Class({
     set_name: function () {
         let text = this.entry.get_text();
         if (typeof text === 'undefined' || text === null || text === '') {
-            this._showError("Please Enter A Folder Name.");
+            this._showError(_("Please Enter A Folder Name."));
             return;
         }
         if (FolderUtil.folder_exists(text)) {
-            this._showError("That Folder Name Is Already In Use.");
+            this._showError(_("That Folder Name Is Already In Use."));
             return;
         }
         this.popModal();

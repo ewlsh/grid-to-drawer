@@ -17,9 +17,8 @@ const AppDisplay = imports.ui.appDisplay;
 
 const Main = imports.ui.main;
 
-
-// TODO: Translations.
-const _ = function (a) { return a; };
+const Gettext = imports.gettext.domain('grid-to-drawer');
+const _ = Gettext.gettext;
 
 const EditDialog = new Lang.Class({
     Name: 'EditDialog',
@@ -111,12 +110,12 @@ const EditDialog = new Lang.Class({
         this.setButtons([
             {
                 action: Lang.bind(this, this.done),
-                label: "Close",
+                label: _("Close"),
                 key: Clutter.Escape
             },
             {
                 action: Lang.bind(this, this.set_apps),
-                label: "Save",
+                label: _("Save"),
                 'default': true
             }
         ]);
