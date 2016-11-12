@@ -45,7 +45,7 @@ function unpatch() {
 }
 
 function MOD_getResultMetas(apps, callback) {
-    ORIG_getResultMetas.call(this, apps, Lang.bind(this, function (metas) {
+    ORIG_getResultMetas.call(this, apps, Lang.bind(this, function(metas) {
         for (let meta of metas) {
             if (Settings.is_customized(meta.id) && Settings.has_custom_name(meta.id)) {
                 meta.name = Settings.get_custom_name(meta.id);
@@ -137,12 +137,12 @@ function MOD_getInitialResultSet(terms, callback, cancellable) {
 
     let usage = Shell.AppUsage.get_default();
     let results = [];
-    groups.forEach(function (group) {
-        group = group.filter(function (appID) {
+    groups.forEach(function(group) {
+        group = group.filter(function(appID) {
             let app = Gio.DesktopAppInfo.new(appID);
             return app && app.should_show();
         });
-        results = results.concat(group.sort(function (a, b) {
+        results = results.concat(group.sort(function(a, b) {
             return usage.compare('', a, b);
         }));
     });

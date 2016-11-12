@@ -11,9 +11,11 @@ const Main = imports.ui.main;
 const Me = imports.misc.extensionUtils.getCurrentExtension();
 const FolderDialog = Me.imports.folder_dialog;
 const FolderUtil = Me.imports.folder_util;
+const Selection = Me.imports.selection;
 
 const AppDisplay = imports.ui.appDisplay;
 const ViewSelector = imports.ui.viewSelector;
+
 
 function setup() {
     this._hidden = false;
@@ -54,7 +56,7 @@ function setup() {
 
     Main.overview.viewSelector.appDisplay.actor.add_actor(this.folder_box);
 
-    Mainloop.idle_add(Lang.bind(this, function () {
+    Mainloop.idle_add(Lang.bind(this, function() {
         get_app_view()._redisplay();
         return false;
     }));
@@ -76,18 +78,18 @@ function cleanup() {
 }
 
 function connect() {
-    this.overviewHiddenSig = Main.overview.connect('hiding', Lang.bind(this, function () {
+    this.overviewHiddenSig = Main.overview.connect('hiding', Lang.bind(this, function() {
         Selection.cancel_selection();
     }));
 
-    this.overviewShownSig = Main.overview.connect('showing', Lang.bind(this, function () {
+    this.overviewShownSig = Main.overview.connect('showing', Lang.bind(this, function() {
         if (!AppDisplay._fc_loaded_mods) {
             log('Modded App Icons Loaded.');
             get_app_view()._redisplay();
         }
     }));
 
-    this.viewSelectorSig = Main.overview.viewSelector.connect('page-changed', Lang.bind(this, function () {
+    this.viewSelectorSig = Main.overview.viewSelector.connect('page-changed', Lang.bind(this, function() {
         if (Main.overview.viewSelector.getActivePage() === ViewSelector.ViewPage.APPS) {
             if (global.settings.get_uint('app-picker-view') === AppDisplay.Views.ALL) {
                 show_selection_tools();
@@ -101,7 +103,7 @@ function connect() {
 
     }));
 
-    this.pickerSig = global.settings.connect('changed::app-picker-view', Lang.bind(this, function () {
+    this.pickerSig = global.settings.connect('changed::app-picker-view', Lang.bind(this, function() {
         if (global.settings.get_uint('app-picker-view') === AppDisplay.Views.ALL) {
             show_selection_tools();
         } else {
@@ -109,10 +111,10 @@ function connect() {
         }
     }));
 
-    this.appViewSig = get_app_view().connect('modded-icon-created', Lang.bind(this, function (n, icon) {
+    this.appViewSig = get_app_view().connect('modded-icon-created', Lang.bind(this, function(n, icon) {
         const app_ = icon.app;
 
-        icon.actor.connect('clicked', Lang.bind(this, function (actor, button) {
+        icon.actor.connect('clicked', Lang.bind(this, function(actor, button) {
             if (Selection.get_selection().indexOf(app_.id) === -1) {
                 Selection.add_selection(app_.id);
             } else {
@@ -169,7 +171,7 @@ function _onCreateFolderBtnClick() {
 
     let dialog = new FolderDialog.FolderDialog();
 
-    dialog.connect('closed', Lang.bind(this, function () {
+    dialog.connect('closed', Lang.bind(this, function() {
         let name = dialog.output;
         FolderUtil.create_folder(name);
         FolderUtil.add_apps(name, Selection.get_selection());

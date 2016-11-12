@@ -24,7 +24,7 @@ const EditDialog = new Lang.Class({
     Name: 'EditDialog',
     Extends: ModalDialog.ModalDialog,
 
-    _init: function (selected_apps, folder_id) {
+    _init: function(selected_apps, folder_id) {
         this.parent({
             styleClass: 'run-dialog',
             destroyOnClose: false
@@ -61,7 +61,7 @@ const EditDialog = new Lang.Class({
         let apps = view.getAllItems();
 
         /* Sort out any icons that are already in folders or are folders themselves. */
-        apps = apps.filter(Lang.bind(this, function (value, index, array) {
+        apps = apps.filter(Lang.bind(this, function(value, index, array) {
             let folderid = FolderUtil.get_folder_for_app(value.id);
             if (value instanceof AppDisplay.AppIcon && (folderid === null || folderid === folder_id)) {
                 return true;
@@ -120,7 +120,7 @@ const EditDialog = new Lang.Class({
             }
         ]);
     },
-    set_apps: function () {
+    set_apps: function() {
         let apps = [];
         for (let [id, check] of this._appChecks) {
             if (check.actor.checked) {
@@ -132,7 +132,7 @@ const EditDialog = new Lang.Class({
         this.output = apps;
         this.close();
     },
-    done: function () {
+    done: function() {
         this.output = null;
         this.close();
     }

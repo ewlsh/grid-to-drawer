@@ -24,7 +24,7 @@ function MOD_loadApps() {
     let result = ORIG_loadApps.apply(this, arguments);
     // Modify on demand.
     if (this.constructor === imports.ui.appDisplay.AllView) {
-        this._allItems.forEach(Lang.bind(this, function (icon) {
+        this._allItems.forEach(Lang.bind(this, function(icon) {
             // Check to make sure the icon is an AppIcon.
             if (typeof (icon.app) !== 'undefined' && icon.app !== null) {
                 icon._fc_selectable = true;

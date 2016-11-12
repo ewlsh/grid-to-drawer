@@ -15,7 +15,7 @@ const UI = Me.imports.ui;
 function edit_app(app) {
     let dialog = new EditAppDialog.EditAppDialog(app);
 
-    dialog.connect('closed', Lang.bind(this, function () {
+    dialog.connect('closed', Lang.bind(this, function() {
         if (dialog.output !== null) {
             let icon_path = dialog.output['icon_path'];
             let icon_path_enabled = dialog.output['icon_path_enabled'];
@@ -43,7 +43,7 @@ function edit_app(app) {
                 Settings.set_custom_name(app.id, name);
             }
 
-            Mainloop.idle_add(Lang.bind(this, function () {
+            Mainloop.idle_add(Lang.bind(this, function() {
                 UI.get_app_view()._redisplay();
                 UI.get_frequent_view()._redisplay();
                 DashPatch.reload_dash_labels();
@@ -63,7 +63,7 @@ function edit_folder(name) {
     let selected_apps = FolderUtil.folder_exists(name) ? FolderUtil.get_apps(name) : [];
     let dialog = new EditDialog.EditDialog(selected_apps, name);
 
-    dialog.connect('closed', Lang.bind(this, function () {
+    dialog.connect('closed', Lang.bind(this, function() {
         let apps = dialog.output;
         if (apps !== null) {
             FolderUtil.remove_folder(name);

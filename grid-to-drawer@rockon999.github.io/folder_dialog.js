@@ -19,7 +19,7 @@ const FolderDialog = new Lang.Class({
     Name: 'FolderDialog',
     Extends: ModalDialog.ModalDialog,
 
-    _init: function () {
+    _init: function() {
         this.parent({
             styleClass: 'run-dialog',
             destroyOnClose: false
@@ -103,7 +103,7 @@ const FolderDialog = new Lang.Class({
             }
         ]);
     },
-    set_name: function () {
+    set_name: function() {
         let text = this.entry.get_text();
         if (typeof text === 'undefined' || text === null || text === '') {
             this._showError(_("Please Enter A Folder Name."));
@@ -117,10 +117,10 @@ const FolderDialog = new Lang.Class({
         this._run(text);
         this.close();
     },
-    _run: function (name) {
+    _run: function(name) {
         this.output = name;
     },
-    _showError: function (message) {
+    _showError: function(message) {
         this._commandError = true;
 
         this._errorMessage.set_text(message);
@@ -134,14 +134,14 @@ const FolderDialog = new Lang.Class({
                 time: 0.1,
                 transition: 'easeOutQuad',
                 onComplete: Lang.bind(this,
-                    function () {
+                    function() {
                         parentActor.set_height(-1);
                         this._errorBox.show();
                     })
             });
         }
     },
-    open: function () {
+    open: function() {
         this.parent();
         this._errorBox.hide();
         this._entryText.set_text('');

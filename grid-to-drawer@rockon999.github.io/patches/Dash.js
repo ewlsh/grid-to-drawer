@@ -19,7 +19,7 @@ function patch() {
     Dash.Dash.prototype._createAppItem = MOD_createAppItem;
 
 
-    Mainloop.idle_add(Lang.bind(this, function () {
+    Mainloop.idle_add(Lang.bind(this, function() {
         if (typeof DashToDock === 'undefined' || DashToDock === null) {
             DashToDock = imports.misc.extensionUtils.extensions['dash-to-dock@micxgx.gmail.com'];
         }

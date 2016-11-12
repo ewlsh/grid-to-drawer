@@ -71,15 +71,17 @@ function MOD_popupMenu() {
 
     if (!this._menu) {
         this._menu = new FolderIconMenu.FolderIconMenu(this);
-        this._menu.connect('activate-window', Lang.bind(this, function (menu, window) {
+        this._menu.connect('activate-window', Lang.bind(this, function(menu, window) {
             this.activateWindow(window);
         }));
-        this._menu.connect('open-state-changed', Lang.bind(this, function (menu, isPoppedUp) {
+        this._menu.connect('open-state-changed', Lang.bind(this, function(menu, isPoppedUp) {
             if (!isPoppedUp)
                 this._onMenuPoppedDown();
         }));
-        let id = Main.overview.connect('hiding', Lang.bind(this, function () { this._menu.close(); }));
-        this.actor.connect('destroy', function () {
+        let id = Main.overview.connect('hiding', Lang.bind(this, function() {
+            this._menu.close();
+        }));
+        this.actor.connect('destroy', function() {
             Main.overview.disconnect(id);
         });
 

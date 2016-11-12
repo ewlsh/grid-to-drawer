@@ -145,7 +145,7 @@ function get_folder_settings(name) {
 
 const _SettingsManager = new Lang.Class({
     Name: 'fc_SettingsManager',
-    load: function () {
+    load: function() {
         this.settings = Convenience.getSettings();
 
         this.folder_settings = Convenience.getSettings('org.gnome.desktop.app-folders');
@@ -161,7 +161,7 @@ const _SettingsManager = new Lang.Class({
             this.app_settings[app_id] = app_settings;
         }
     },
-    refresh_apps: function () {
+    refresh_apps: function() {
         this.app_settings = {};
 
         let custom_apps = this.settings.get_strv('custom-apps');

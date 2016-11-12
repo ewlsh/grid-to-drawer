@@ -16,7 +16,7 @@ const FolderIconMenu = new Lang.Class({
     Name: 'FolderIconMenu',
     Extends: PopupMenu.PopupMenu,
 
-    _init: function (source) {
+    _init: function(source) {
         let side = St.Side.LEFT;
         if (Clutter.get_default_text_direction() === Clutter.TextDirection.RTL)
             side = St.Side.RIGHT;
@@ -31,42 +31,44 @@ const FolderIconMenu = new Lang.Class({
         this.actor.add_style_class_name('app-well-menu');
 
         // Chain our visibility and lifecycle to that of the source
-        source.actor.connect('notify::mapped', Lang.bind(this, function () {
+        source.actor.connect('notify::mapped', Lang.bind(this, function() {
             if (!source.actor.mapped)
                 this.close();
         }));
-        source.actor.connect('destroy', Lang.bind(this, function () { this.actor.destroy(); }));
+        source.actor.connect('destroy', Lang.bind(this, function() {
+            this.actor.destroy();
+        }));
 
         Main.uiGroup.add_actor(this.actor);
     },
 
-    _redisplay: function () {
+    _redisplay: function() {
         this.removeAll();
 
-        let item = this._appendMenuItem("Edit Folder");
-        item.connect('activate', Lang.bind(this, function () {
+        let item = this._appendMenuItem('Edit Folder');
+        item.connect('activate', Lang.bind(this, function() {
             Editor.edit_folder(this._source.id);
         }));
 
-        item = this._appendMenuItem("Delete Folder");
-        item.connect('activate', Lang.bind(this, function () {
+        item = this._appendMenuItem('Delete Folder');
+        item.connect('activate', Lang.bind(this, function() {
             FolderUtil.remove_folder(this._source.id);
         }));
     },
 
-    _appendSeparator: function () {
+    _appendSeparator: function() {
         let separator = new PopupMenu.PopupSeparatorMenuItem();
         this.addMenuItem(separator);
     },
 
-    _appendMenuItem: function (labelText) {
+    _appendMenuItem: function(labelText) {
         // TODO: app-well-menu-item style
         let item = new PopupMenu.PopupMenuItem(labelText);
         this.addMenuItem(item);
         return item;
     },
 
-    popup: function (activatingButton) {
+    popup: function(activatingButton) {
         this._redisplay();
         this.open();
     }

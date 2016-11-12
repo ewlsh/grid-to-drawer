@@ -51,6 +51,6 @@ function get_selection() {
     return this.selected_apps;
 }
 
-function is_active(){
+function is_active() {
     return this.selecting;
 }

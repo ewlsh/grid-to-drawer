@@ -20,7 +20,7 @@ const EditAppDialog = new Lang.Class({
     Name: 'EditAppDialog',
     Extends: ModalDialog.ModalDialog,
 
-    _init: function (app) {
+    _init: function(app) {
         this.parent({
             styleClass: 'run-dialog',
             destroyOnClose: false
@@ -54,7 +54,7 @@ const EditAppDialog = new Lang.Class({
         ShellEntry.addContextMenu(this.nameEntry);
 
 
-        this.nameCheck.actor.connect('clicked', Lang.bind(this, function (check, mouse_button) {
+        this.nameCheck.actor.connect('clicked', Lang.bind(this, function(check, mouse_button) {
             if (Settings.is_customized(this.app.id) && Settings.has_custom_name(this.app.id)) {
                 this.nameEntry.set_text(Settings.get_custom_name(this.app.id));
             } else {
@@ -93,7 +93,7 @@ const EditAppDialog = new Lang.Class({
         ShellEntry.addContextMenu(this.entry);
 
 
-        this.iconCheck.actor.connect('clicked', Lang.bind(this, function (check, mouse_button) {
+        this.iconCheck.actor.connect('clicked', Lang.bind(this, function(check, mouse_button) {
             let icon_path = Settings.get_icon_path(this.app.id);
             this.entry.set_text(icon_path);
 
@@ -137,27 +137,28 @@ const EditAppDialog = new Lang.Class({
             }
         ]);
     },
-    set_name: function () {
+    set_name: function() {
         if (this.output === null)
             this.output = {};
         this.output['name_enabled'] = this.nameCheck.actor.checked;
         this.output['name'] = this.nameEntry.get_text();
     },
-    set_icon_path: function () {
-        if (this.output === null)
+    set_icon_path: function() {
+        if (this.output === null) {
             this.output = {};
+        }
         this.output['icon_path_enabled'] = this.iconCheck.actor.checked;
         this.output['icon_path'] = this.entry.get_text();
     },
-    exit: function () {
+    exit: function() {
         this.close();
     },
-    save: function () {
+    save: function() {
         this.set_icon_path();
         this.set_name();
         this.close();
     },
-    open: function () {
+    open: function() {
         this.parent();
 
         if (Settings.is_customized(this.app.id) && Settings.has_custom_name(this.app.id)) {

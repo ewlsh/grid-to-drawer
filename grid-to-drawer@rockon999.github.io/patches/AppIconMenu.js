@@ -19,8 +19,8 @@ function unpatch() {
 
 function MOD_redisplay() {
     ORIG_redisplay.apply(this, arguments);
-    let item = this._appendMenuItem('Edit');
-    item.connect('activate', Lang.bind(this, function () {
+    let item = this._appendMenuItem('Edit Icon');
+    item.connect('activate', Lang.bind(this, function() {
         Editor.edit_app(this._source.app);
     }));
 }
