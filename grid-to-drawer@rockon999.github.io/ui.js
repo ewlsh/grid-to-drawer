@@ -31,7 +31,7 @@ function setup() {
     this._newFolderBtn = new St.Button({
         can_focus: true
     });
-    this._newFolderBtn.child = new St.Icon({ icon_name: 'folder-new', icon_size: 32 });
+    this._newFolderBtn.child = new St.Icon({ icon_name: 'folder-new-symbolic', fallback_icon_name: 'folder-new', icon_size: 32 });
 
     this._createFolderBtn = new St.Button({
         can_focus: true

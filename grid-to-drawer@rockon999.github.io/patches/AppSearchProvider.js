@@ -68,9 +68,9 @@ function MOD_getInitialResultSet(terms, callback, cancellable) {
     for (let group of groups) {
         for (let app_id of group) {
             // let app = Gio.DesktopAppInfo.new(app_id);
-            if (Settings.is_customized(app_id) && Settings.has_custom_name(app_id.get_id())) {
-                contains.push(app_id.get_id());
-                groupPlacements[app_id.get_id()] = currentPlacement;
+            if (Settings.is_customized(app_id) && Settings.has_custom_name(app_id)) {
+                contains.push(app_id);
+                groupPlacements[app_id] = currentPlacement;
             }
         }
         currentPlacement++;
